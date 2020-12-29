@@ -1,0 +1,108 @@
+---
+title: "Statistical Inference project 1"
+author: "Kumar Shaket"
+date: "28/12/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Short Summary
+
+Here we want to run a simulation consisting in generating 40 variables from an exponential function with
+given parameters and repeating this for 1000 times. Then we compute the mean for each simulation(1000
+means in total).
+
+## Load required packages
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+## Building up the data
+```{r}
+set.seed(1000)
+n=40
+lambda=0.2
+t=1000
+```
+## Form the matrix
+```{r}
+trialnumber <- replicate(t,rexp(n,lambda))
+trialmatrix <- matrix(trialnumber,t,n)
+head(trialmatrix)
+```
+##Calculation
+Compute sample mean
+```{r}
+trialmean <- rowMeans(trialmatrix)
+```
+
+## Q1 : Show the sample mean and compare it to the theoretical mean of the distribution.
+sample mean
+```{r}
+smean <- mean(trialmean)
+smean
+```
+theorical mean
+```{r}
+thmean <- 1/lambda
+thmean
+```
+Difference between Sample and Theortical Mean
+```{r}
+thmean-smean
+```
+Therefore we conclude mean difference between sample and theortical is very small
+
+## Q2: Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution
+sample variance
+```{r}
+sv <- var(trialmean)
+sv
+```
+theortical variance
+```{r}
+tv <- (1/lambda)^2 /n
+tv
+```
+Difference in the variance
+```{r}
+tv-sv
+```
+We conclude variance difference between sample and theortical is very small
+## Q3: Show that the distribution is approximately normal.
+
+```{r}
+hist(trialmean,xlab = "Mean of each trial",ylab = "Density",main = "Distribution of Sample Means",breaks = n,prob=TRUE)
+lines(density(trialmean))
+abline(v=1/lambda,col='red')
+```
+approximately normal
+
+The next step is to proof if the distribution is normally distributed, with the confidence interval In this situation, we can compare the confidence interval between theorical and sample. If they have a small difference, that means the means, variance and also distribution tends to be normally distributed
+```{r}
+#Compute theortical standard deviation
+tsd <- 1/lambda/sqrt(n)
+tsd
+```
+
+```{r}
+#Compute CI in theortical 
+tci<- thmean +c(-1,1)*1.96 * tsd/n
+tci
+```
+```{r}
+#Compute actual standard deviation
+ssd <- sd(trialmean)
+ssd
+```
+
+```{r}
+#Compute CI in actual
+sci<- smean +c(-1,1)*1.96 * ssd/sqrt(n)
+sci
+```
+From the result, we can see that the distribution is not exactly normally distributied. However, with larger sample size then according to central limit theorem, the data is more likely to be normally distributed.

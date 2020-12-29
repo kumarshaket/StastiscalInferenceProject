@@ -1,0 +1,84 @@
+---
+title: 'Part 2: Basic Inferential Data Analysis'
+author: "Kumar Shaket"
+date: "28/12/2020"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load the ToothGrowth Data
+```{r}
+library(datasets)
+str(ToothGrowth)
+data("ToothGrowth")
+head(ToothGrowth)
+```
+## Summary
+```{r}
+#Identifying if there is any NA value in dataset
+sum(!complete.cases(ToothGrowth))
+```
+This suggest there is no NA values in the dataset
+```{r}
+#Computing  summary of ToothGrowth Dataset
+summary(ToothGrowth)
+```
+##Exploratory Analysis
+```{r}
+library(ggplot2)
+```
+
+```{r}
+#Computing dose factor
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+```
+
+```{r}
+#Plotting boxplot to understand how dose impact tooth length
+p <- ggplot(ToothGrowth,aes(x=dose,y=len,fill=dose))+ geom_boxplot() + ggtitle("Fig1: Dispersion of tooth growth by dose")+xlab("dose in mg")+ylab("tooth length")
+p
+```
+We can see that the higher the dose is, the longer the teeth are. We can notice that for a dose of 1 mg, the mean is nearly twice than for dose 0.5 mg. The progression is then lower when the dose is 2 mg. The position of the boxes are really different; this is a first clue for suggesting that the tooth length depends a lot of the dose.
+
+```{r}
+#plotting boxplot of delivery method of these doses impacting toothlength
+p1 <- ggplot(ToothGrowth,aes(x=supp,y=len,fill=supp))+ geom_boxplot() + ggtitle("Fig1: Dispersion of tooth growth by delivery method")+xlab("Delivery Method")+ylab("Tooth Length")
+p1
+```
+The boxes are quite similar. However, the median is much higher for Orange Juice than for Vitamin C; that means that for Orange Juice, the high values are more numerous than the low values, in comparison with Vitamin C.
+## Hypothesis Tests
+we will test if the delivery mode has an influence on the tooth growth. nul hypothesis H0 could be formulated as follows :
+
+#H0 : The delivery mode of Vitamin C does not have any influence on the tooth growth
+```{r}
+dose <-ToothGrowth$dose
+supply <- ToothGrowth$supp
+len <- ToothGrowth$len
+t.test(len[supply=="VC"],len[supply=="OJ"],paired = FALSE)
+```
+This first test shows the following :
+
+* The p-value is 0.06, i.e. nearly the significance level α = 0.05.
+* So we do not reject the null hypothesis, but as 0.05≦ p-value ≦0.1, it is not clearly obvious that we can reject the null hypothesis.
+* The confidence interval contains 0, so the test is not really significant.
+
+Now let’s try to test the influence of the dose on the tooth growth
+```{r}
+t.test(len[dose==0.5],len[dose==1],paired = FALSE)
+```
+This second test shows the following :
+
+* The p-value is nearly 0  and hence we can reject H0
+* The confidence interval doesn't contain 0 
+
+An identical conclusion can be taken comparing the length of dose = 1 and dose = 2. This could already be detected from the boxplot above.
+
+## Conclusion
+* The dose of Vitamin C is clearly a factor of growth of the teeth.
+* The delivery mode does not have much impact on the teeth growth.
